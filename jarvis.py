@@ -110,9 +110,10 @@ class Jarvis:
 
         selected = best or fallback
         if selected:
-            self.engine.setProperty("voice", selected.id)
+            self._voice_id = selected.id
             print(f"Voice selected: {selected.name or selected.id}")
         else:
+            self._voice_id = None
             print("Warning: No British English voice found. Using system default.")
             if system == "Windows":
                 print(
@@ -120,8 +121,15 @@ class Jarvis:
                     "Speech > Manage voices > Add voices > English (United Kingdom)"
                 )
 
-        self.engine.setProperty("rate", 170)
-        self.engine.setProperty("volume", 1.0)
+        # Apply settings to the initial engine
+        self._apply_voice_settings(self.engine)
+
+    def _apply_voice_settings(self, engine):
+        """Apply voice, rate, and volume to the given engine instance."""
+        if self._voice_id:
+            engine.setProperty("voice", self._voice_id)
+        engine.setProperty("rate", 170)
+        engine.setProperty("volume", 1.0)
 
     def _calibrate_microphone(self):
         """Adjust recognizer sensitivity for ambient noise."""
@@ -191,8 +199,13 @@ class Jarvis:
     def speak(self, text):
         """Speak the given text aloud and print it."""
         print(f"Jarvis: {text}")
-        self.engine.say(text)
-        self.engine.runAndWait()
+        # Reinitialize the engine each call to avoid SAPI5 state corruption
+        # after mixing with PyAudio (known pyttsx3 issue on Windows).
+        engine = pyttsx3.init()
+        self._apply_voice_settings(engine)
+        engine.say(text)
+        engine.runAndWait()
+        engine.stop()
 
     def play_beep(self):
         """Play a short beep tone to indicate Jarvis is listening."""
