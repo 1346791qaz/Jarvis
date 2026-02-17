@@ -13,3 +13,4 @@ venv/
 ENV/
 .mypy_cache/
 .pytest_cache/
+.jarvis/
