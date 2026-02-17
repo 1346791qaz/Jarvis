@@ -8,10 +8,10 @@ Setup (Windows 11):
     3. Set your API key:
            set ANTHROPIC_API_KEY=your-api-key-here
        Or permanently via System Properties > Environment Variables.
-    4. Install a British male voice (if not already present):
+    4. Install a American male voice (if not already present):
            Settings > Time & Language > Speech > Manage voices > Add voices
            Select "English (United Kingdom)" to install voices like
-           "Microsoft George" (male, British).
+           "Microsoft mark" (male, American).
 
 Setup (Linux):
     1. sudo apt-get install portaudio19-dev espeak-ng python3-pyaudio
@@ -74,7 +74,7 @@ class Jarvis:
         self._calibrate_microphone()
 
     def _setup_voice(self):
-        """Configure text-to-speech for a British male voice."""
+        """Configure text-to-speech for a American male voice."""
         voices = self.engine.getProperty("voices")
         system = platform.system()
 
@@ -82,16 +82,16 @@ class Jarvis:
         fallback = None
 
         if system == "Windows":
-            # Windows SAPI5 voices — look for British English male
+            # Windows SAPI5 voices — look for American English male
             for voice in voices:
                 vid = voice.id.lower()
                 vname = (voice.name or "").lower()
-                is_british = "en-gb" in vid or "en_gb" in vid
-                is_male = "george" in vid or "george" in vname
-                if is_british and is_male:
+                is_american = "en-us" in vid or "en_us" in vid
+                is_male = "mark" in vid or "mark" in vname
+                if is_american and is_male:
                     best = voice
                     break
-                if is_british and best is None:
+                if is_american and best is None:
                     best = voice
                 if not fallback and ("david" in vname or "en-us" in vid):
                     fallback = voice
@@ -114,11 +114,11 @@ class Jarvis:
             print(f"Voice selected: {selected.name or selected.id}")
         else:
             self._voice_id = None
-            print("Warning: No British English voice found. Using system default.")
+            print("Warning: No American English voice found. Using system default.")
             if system == "Windows":
                 print(
-                    "Tip: Install British voices via Settings > Time & Language > "
-                    "Speech > Manage voices > Add voices > English (United Kingdom)"
+                    "Tip: Install American voices via Settings > Time & Language > "
+                    "Speech > Manage voices > Add voices > English (United States)"
                 )
 
         # Apply settings to the initial engine
@@ -276,7 +276,7 @@ class Jarvis:
                 system=(
                     "You are Jarvis, an intelligent and helpful personal assistant. "
                     "You speak in a polished, articulate manner with dry wit, similar to "
-                    "a refined British butler. Keep your responses concise and conversational "
+                    "a refined American butler. Keep your responses concise and conversational "
                     "since they will be read aloud. Avoid markdown formatting, bullet points, "
                     "code blocks, or any visual formatting. Use plain spoken English only.\n\n"
                     "You have access to conversation history from previous sessions. "
